@@ -33,41 +33,62 @@ class _NewStopWatchState extends State<NewStopWatch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(20.0,),
           child: Column(
             children: <Widget>[
+              Column(
+                children: [
+                 Image.network('http://coderzhunt.com/wp-content/uploads/2022/08/logo.png',
+                 scale: 3.0,),
+                ],
+              ),
+              SizedBox(height: 40),
               Text(elapsedTime,
-                  style: TextStyle(fontSize: 25.0, color: Colors.white)),
-              SizedBox(height: 20.0),
+                  style: TextStyle(fontSize: 35.0,
+                      color: Colors.black,
+                  fontWeight: FontWeight.bold)),
+              SizedBox(height: 40.0),
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    FloatingActionButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18.0),
-                          side: BorderSide(color: Colors.red)),
-                      backgroundColor: Colors.red,
-                      onPressed: () => startOrStop(),
-                      child: Text(startStop ? 'Clock In' : "Clock Out"),
+                    Container(
+                      width: 180,
+                      height: 50,
+                      child: FloatingActionButton(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18.0),
+                            ),
+                        backgroundColor: Color(0xfff26524),
+                        onPressed: () => startOrStop(),
+                        child: Text(startStop ? 'CLOCK IN' : "CLOCK OUT",
+                        textAlign:TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18
+                          ),),
+                      ),
                     ),
                     SizedBox(height: 50),
                     Container(
-                      width: 520,
-                      height: 420,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _screenshots.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: CapturedScreenAreaView(area: _screenshots[index]),
-                          );
-                        },
+                      color: Colors.black,
+                      width: 820,
+                      height: 520,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _screenshots.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: CapturedScreenAreaView(area: _screenshots[index]),
+                              subtitle: Text(''),
+                            );
+                          },
+                        ),
                       ),
-                    ),
                     SizedBox(height: 50),
                     if (showClearButton)
                       ElevatedButton(
