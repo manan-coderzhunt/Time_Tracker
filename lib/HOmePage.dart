@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_screen_capture/flutter_screen_capture.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 
 class Screenshot {
@@ -25,7 +26,7 @@ class _NewStopWatchState extends State<NewStopWatch> {
   bool startStop = true;
   bool showClearButton = false;
 
-  String elapsedTime = '';
+  String elapsedTime = '00:00:00';
 
   updateTime(Timer timer) {
     if (watch.isRunning) {
@@ -45,41 +46,125 @@ class _NewStopWatchState extends State<NewStopWatch> {
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(20.0,),
+          padding: EdgeInsets.symmetric(vertical: 90.0),
           child: Column(
             children: <Widget>[
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                 Image.network('http://coderzhunt.com/wp-content/uploads/2022/08/logo.png',
-                 scale: 3.0,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Started at ",style:
+                      TextStyle(
+                        fontSize: 18,
+                        color: Color(0xff5c6baf),
+                        fontWeight: FontWeight.w400,
+                      ),
+                      ),
+                      Text("${DateTime.now().toLocal().hour.toString()}:${DateTime.timestamp().minute.toString()}",style:
+                      TextStyle(
+                        fontSize: 20,
+                        color: Color(0xff5c6baf),
+                        fontWeight: FontWeight.bold,
+                      ),
+                      ),
+                      SizedBox(width: 20),
+                      Text("${DateFormat("yyyy-MM-dd").format}"),
+                      // Text("${DateTime.now().toLocal().month.toString()} ${DateTime.now().toLocal().day.toString()}, ${DateTime.now().toLocal().year.toString()}",
+                      // style: TextStyle(
+                      //   fontSize: 18,
+                      //   color: Color(0xff5c6baf),
+                      //   fontWeight: FontWeight.w400,
+                      // ),
+                      // ),
+                    ],
+                  ),
                 ],
               ),
               SizedBox(height: 40),
               Text(elapsedTime,
-                  style: TextStyle(fontSize: 35.0,
-                      color: Colors.black,
+                  style: TextStyle(fontSize: 55.0,
+                      color: Color(0xff33394e),
                   fontWeight: FontWeight.bold)),
               SizedBox(height: 40.0),
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Container(
-                      width: 180,
-                      height: 50,
-                      child: FloatingActionButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 120,
+                          height: 50,
+                          child: FloatingActionButton(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                                ),
+                            backgroundColor: Color(0xffff723a),
+                            onPressed: () => startOrStop(),
+                            child: Text(startStop ? 'CLOCK IN' : "CLOCK OUT",
+                            textAlign:TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18
+                              ),),
+                          ),
+                        ),
+                        SizedBox(width: 30),
+                        Container(
+                          width: 140,
+                          height: 40,
+                          child: FloatingActionButton(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(width: 1,color: Color(0xff5c6baf),),
+                                borderRadius: BorderRadius.circular(5.0),
                             ),
-                        backgroundColor: Color(0xfff26524),
-                        onPressed: () => startOrStop(),
-                        child: Text(startStop ? 'CLOCK IN' : "CLOCK OUT",
-                        textAlign:TextAlign.center,
+                            backgroundColor:Colors.white,
+                            elevation: 0,
+                            onPressed: () => startOrStop(),
+                            child: Text("Take a Break",
+                            textAlign:TextAlign.center,
+                              style: TextStyle(
+                                  color: Color(0xff8495e8),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14
+                              ),),
+                          ),
+                        ),
+                        SizedBox(width: 20),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Break Time Left',
                           style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18
+                              color: Color(0xff8495e8),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14
                           ),),
+                            Text("30 Min",
+                              style: TextStyle(
+                                  color: Color(0xff8495e8),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14
+                              ),)
+                          ],
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 1,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.5),
+                        boxShadow: [
+                          BoxShadow(
+                              blurRadius: 1.0
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 50),
@@ -117,7 +202,7 @@ class _NewStopWatchState extends State<NewStopWatch> {
                       ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),

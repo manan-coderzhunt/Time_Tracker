@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tracker/HOmePage.dart';
+import 'package:tracker/TimeTracker.dart';
 
 void main() {
   runApp(const MyApp());
