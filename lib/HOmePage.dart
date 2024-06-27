@@ -2,6 +2,15 @@ import 'dart:async';
 import 'package:flutter_screen_capture/flutter_screen_capture.dart';
 import 'package:flutter/material.dart';
 
+
+class Screenshot {
+  final CapturedScreenArea area;
+  final String captureTime;
+  final DateTime dateTime;
+
+  Screenshot(this.area, this.captureTime, this.dateTime);
+}
+
 class NewStopWatch extends StatefulWidget {
   @override
   _NewStopWatchState createState() => _NewStopWatchState();
@@ -9,7 +18,7 @@ class NewStopWatch extends StatefulWidget {
 
 class _NewStopWatchState extends State<NewStopWatch> {
   final _plugin = ScreenCapture();
-  List<CapturedScreenArea> _screenshots = [];
+  List<Screenshot> _screenshots = [];
 
   Stopwatch watch = Stopwatch();
   Timer? timer;
@@ -83,8 +92,19 @@ class _NewStopWatchState extends State<NewStopWatch> {
                           itemCount: _screenshots.length,
                           itemBuilder: (context, index) {
                             return ListTile(
-                              title: CapturedScreenAreaView(area: _screenshots[index]),
-                              subtitle: Text(''),
+                              title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                              CapturedScreenAreaView(area: _screenshots[index].area),
+                              SizedBox(height: 20),
+                              Text(startStop ? "Current Time ${_screenshots[index].dateTime.hour}:${_screenshots[index].dateTime.minute}:${_screenshots[index].dateTime.second}" : '',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25,
+                                  color: Colors.white,
+                              ),),
+                                ],
+                              ),
                             );
                           },
                         ),
@@ -167,9 +187,10 @@ class _NewStopWatchState extends State<NewStopWatch> {
 
   Future<void> _captureFullScreen() async {
     final area = await _plugin.captureEntireScreen();
+    final currentTime = DateTime.now();
     if (area != null) {
       setState(() {
-        _screenshots.add(area);
+        _screenshots.add(Screenshot(area, elapsedTime, currentTime));
       });
     }
   }
