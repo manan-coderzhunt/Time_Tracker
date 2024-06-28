@@ -1,43 +1,11 @@
-import 'dart:async';
 import 'package:flutter_screen_capture/flutter_screen_capture.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:tracker/controllers/controller.dart';
 
-class Screenshot {
-  final CapturedScreenArea area;
-  final String captureTime;
-  final DateTime dateTime;
-
-  Screenshot(this.area, this.captureTime, this.dateTime);
-}
-
-class NewStopWatch extends StatefulWidget {
-  @override
-  _NewStopWatchState createState() => _NewStopWatchState();
-}
-
-class _NewStopWatchState extends State<NewStopWatch> {
-  final _plugin = ScreenCapture();
-  List<Screenshot> _screenshots = [];
-
-  Stopwatch watch = Stopwatch();
-  Timer? timer;
-  bool startStop = true;
-  bool showClearButton = false;
-
-  String elapsedTime = '00:00:00';
-
-  updateTime(Timer timer) {
-    if (watch.isRunning) {
-      setState(() {
-        elapsedTime = transformMilliSeconds(watch.elapsedMilliseconds);
-      });
-    }
-  }
-
-  ScreenTimerUpdate(Timer timer) {
-    _captureFullScreen();
-  }
+class NewStopWatch extends StatelessWidget {
+  final NewStopWatchController controller = Get.put(NewStopWatchController());
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +52,13 @@ class _NewStopWatchState extends State<NewStopWatch> {
                 ],
               ),
               SizedBox(height: 40),
-              Text(elapsedTime,
-                  style: TextStyle(
-                      fontSize: 55.0,
-                      color: Color(0xFF003E62),
-                      fontWeight: FontWeight.bold)),
+              Obx(() {
+                return Text(controller.elapsedTime.value,
+                    style: TextStyle(
+                        fontSize: 55.0,
+                        color: Color(0xFF003E62),
+                        fontWeight: FontWeight.bold));
+              }),
               SizedBox(height: 40.0),
               Center(
                 child: Column(
@@ -105,14 +75,18 @@ class _NewStopWatchState extends State<NewStopWatch> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             backgroundColor: Color(0xFFFD9E48),
-                            onPressed: () => startOrStop(),
-                            child: Text(
-                              startStop ? 'CLOCK IN' : "CLOCK OUT",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15),
+                            onPressed: () => controller.startOrStop(),
+                            child: Obx(
+                              () => Text(
+                                controller.startStop.value
+                                    ? 'CLOCK IN'
+                                    : "CLOCK OUT",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15),
+                              ),
                             ),
                           ),
                         ),
@@ -188,9 +162,11 @@ class _NewStopWatchState extends State<NewStopWatch> {
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 40.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Today",
@@ -232,10 +208,9 @@ class _NewStopWatchState extends State<NewStopWatch> {
                     Container(
                       color: Color(0xFFFAFAFA),
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
                       child: ListView.builder(
                         shrinkWrap: true,
-                        itemCount: 16,
+                        itemCount: 2,
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
@@ -252,9 +227,11 @@ class _NewStopWatchState extends State<NewStopWatch> {
                               height: 80,
                               child: ListTile(
                                 title: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Row(
                                         children: [
@@ -315,13 +292,14 @@ class _NewStopWatchState extends State<NewStopWatch> {
                                       ),
                                       Center(
                                         child: Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 18.0),
+                                          padding: const EdgeInsets.only(
+                                              bottom: 18.0),
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              Text("${elapsedTime} h",
+                                              Text(
+                                                  "${controller.elapsedTime.value} h",
                                                   style: TextStyle(
                                                       fontSize: 18.0,
                                                       color: Color(0xff687f8a),
@@ -343,41 +321,43 @@ class _NewStopWatchState extends State<NewStopWatch> {
                     SizedBox(height: 50),
                     Container(
                       color: Colors.black,
-                      width: MediaQuery.of(context).size.width-80,
+                      width: MediaQuery.of(context).size.width - 80,
                       height: MediaQuery.of(context).size.height,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: _screenshots.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CapturedScreenAreaView(
-                                    area: _screenshots[index].area),
-                                SizedBox(height: 20),
-                                Text(
-                                  startStop
-                                      ? "Current Time ${_screenshots[index].dateTime.hour}:${_screenshots[index].dateTime.minute}:${_screenshots[index].dateTime.second}"
-                                      : '',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                    color: Colors.white,
-                                  ),
+                      child: Obx(() => ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: controller.screenshots.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CapturedScreenAreaView(
+                                        area:
+                                            controller.screenshots[index].area),
+                                    SizedBox(height: 20),
+                                    Text(
+                                      controller.startStop.value
+                                          ? "Current Time ${controller.screenshots[index].dateTime.hour}:${controller.screenshots[index].dateTime.minute}:${controller.screenshots[index].dateTime.second}"
+                                          : '',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                              );
+                            },
+                          )),
                     ),
                     SizedBox(height: 50),
-                    if (showClearButton)
-                      ElevatedButton(
-                        onPressed: clearScreenshots,
-                        child: Text("Clear Screenshots"),
-                      ),
+                    Obx(() => controller.showClearButton.value
+                        ? ElevatedButton(
+                            onPressed: controller.clearScreenshots,
+                            child: Text("Clear Screenshots"),
+                          )
+                        : Container()),
                   ],
                 ),
               ),
@@ -386,75 +366,5 @@ class _NewStopWatchState extends State<NewStopWatch> {
         ),
       ),
     );
-  }
-
-  startOrStop() {
-    if (startStop) {
-      startWatch();
-      NewScreenTimer();
-    } else {
-      stopWatch();
-    }
-  }
-
-  startWatch() {
-    setState(() {
-      startStop = false;
-      watch.start();
-      timer = Timer.periodic(Duration(seconds: 0), updateTime);
-    });
-  }
-
-  NewScreenTimer() {
-    timer = Timer.periodic(Duration(seconds: 5), ScreenTimerUpdate);
-    _captureFullScreen();
-  }
-
-  stopWatch() {
-    setState(() {
-      startStop = true;
-      showClearButton = true;
-      watch.reset();
-      watch.stop();
-      timer?.cancel();
-      setTime();
-    });
-  }
-
-  clearScreenshots() {
-    setState(() {
-      _screenshots.clear();
-      showClearButton = false;
-    });
-  }
-
-  setTime() {
-    var timeSoFar = watch.elapsedMilliseconds;
-    setState(() {
-      elapsedTime = transformMilliSeconds(timeSoFar);
-    });
-  }
-
-  transformMilliSeconds(int milliseconds) {
-    int hundreds = (milliseconds / 10).truncate();
-    int seconds = (hundreds / 100).truncate();
-    int minutes = (seconds / 60).truncate();
-    int hours = (minutes / 60).truncate();
-
-    String hoursStr = (hours % 60).toString().padLeft(2, '0');
-    String minutesStr = (minutes % 60).toString().padLeft(2, '0');
-    String secondsStr = (seconds % 60).toString().padLeft(2, '0');
-
-    return "$hoursStr:$minutesStr:$secondsStr";
-  }
-
-  Future<void> _captureFullScreen() async {
-    final area = await _plugin.captureEntireScreen();
-    final currentTime = DateTime.now();
-    if (area != null) {
-      setState(() {
-        _screenshots.add(Screenshot(area, elapsedTime, currentTime));
-      });
-    }
   }
 }
